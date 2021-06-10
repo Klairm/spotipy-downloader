@@ -1,4 +1,4 @@
-# Spotify PLaylist Downloader
+# Spotify Playlist Downloader
 
 Little script in Python to download spotify playlists.
 
