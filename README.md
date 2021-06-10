@@ -6,7 +6,7 @@ Little script in Python to download spotify playlists.
 
 All the requirements are listed in the requirements.txt, use `python3 pip install -r requirements.txt`
 
-##Used:
+## Used:
 	```
 		- Spotipy https://github.com/plamere/spotipy
 		- youtube-search-python https://github.com/alexmercerind/youtube-search-python
@@ -14,13 +14,13 @@ All the requirements are listed in the requirements.txt, use `python3 pip instal
 	```
 	
 
-##Usage:
+## Usage:
 
 ```
 	python3 spoti_downloader.py playlist_url download_path
 
 ```
 
-##Todo:
+## Todo:
 
 	- Progress bar
