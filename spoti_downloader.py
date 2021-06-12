@@ -5,6 +5,12 @@ import os
 from spotipy.oauth2 import SpotifyClientCredentials
 from youtubesearchpython import VideosSearch
 from pytube import YouTube
+import pytube.request
+
+# Need to change the chunk size to get on_progress callbacks if the song downloading is lower than 9MB -> https://github.com/pytube/pytube/issues/1017
+pytube.request.default_range_size = 1048576  # Changed to 1MB
+
+offset = 0
 
 
 try:
@@ -34,7 +40,7 @@ if len(sys.argv) < 3:
 else:
     download_path = sys.argv[2]
 
-offset = 0
+
 
 client_credentials_manager = SpotifyClientCredentials(client_id=cred_json.get(
     'client_id'), client_secret=cred_json.get('client_secret'))
@@ -45,6 +51,15 @@ total = sp.playlist_items(playlist_url, fields='total').get('total')
 
 def completed(artist, song_name):
     print(f"Downloaded {artist} - {song_name}")
+
+
+def progress_bar(chunk, _file_handle, bytes_remaining):
+    size = song.filesize
+    # X/Y * 100 = Z
+    print(f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artist} - {song_name}", end='\r')
+    if bytes_remaining == 0:
+        print(f"Download completed {artist} - {song_name}")
+
 
 while offset < total:
     if offset == total:
@@ -58,6 +73,6 @@ while offset < total:
         print(f"Skip existing song... {artist} - {song_name}")
     else:
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get('result')[0].get('link')
-        song = YouTube(yt_link,on_complete_callback=completed(artist, song_name)).streams.get_audio_only()
+        song = YouTube(
+            yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
         song.download(output_path=download_path, filename=f"{artist} - {song_name}")
-

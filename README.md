@@ -20,7 +20,3 @@ All the requirements are listed in the requirements.txt, use `python3 pip instal
 	python3 spoti_downloader.py playlist_url download_path
 
 ```
-
-## Todo:
-
-	- Progress bar
