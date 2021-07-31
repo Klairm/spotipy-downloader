@@ -26,6 +26,7 @@ except FileNotFoundError:
 }
 
         ''')
+    sys.exit()
 
 if len(sys.argv) <= 1:
     # Path is optional, by default it will be the current one.
@@ -75,4 +76,4 @@ while offset < total:
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get('result')[0].get('link')
         song = YouTube(
             yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
-        song.download(output_path=download_path, filename=f"{artist} - {song_name}")
+        song.download(output_path=download_path, filename=f"{artist} - {song_name}.mp4")
