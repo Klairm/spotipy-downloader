@@ -7,6 +7,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from youtubesearchpython import VideosSearch
 from pytube import YouTube
 import pytube.request
+import pytube.extract
+
 
 # Need to change the chunk size to get on_progress callbacks if the song downloading is lower than 9MB -> https://github.com/pytube/pytube/issues/1017
 pytube.request.default_range_size = 1048576  # Changed to 1MB
@@ -66,19 +68,27 @@ def progress_bar(chunk, _file_handle, bytes_remaining):
 while offset < total:
     if offset == total:
         break
+    # Get artist name and song name using the spotify API
     artist = sp.playlist_items(playlist_url, offset=offset, fields='items.track.artists.name').get(
         'items')[0].get('track').get('artists')[0].get('name')
     song_name = sp.playlist_items(playlist_url, offset=offset, fields='items.track.name').get(
         'items')[0].get('track').get('name')
     offset += 1
+
+
     if os.path.exists(f"{download_path}/{artist} - {song_name}.mp4"):
         print(f"Skip existing song... {artist} - {song_name}")
     else:
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get('result')[0].get('link')
+        
         if os.name != 'posix':
             song_name = re.sub(r'[<>:"/\|?*]','',song_name)
         else:
             pass
-        song = YouTube(
-            yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
-        song.download(output_path=download_path, filename=f"{artist} - {song_name}.mp4")
+        try:
+            song = YouTube(yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
+            song.download(output_path=download_path, filename=f"{artist} - {song_name}.mp4")
+        except pytube.exceptions.AgeRestrictedError:
+            # FIXME: Add some solution to age restricted result
+            print(f"Skipping {artist} - {song_name} due age restriction [FIX NEEDED]")   
+            
