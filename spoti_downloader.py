@@ -74,6 +74,10 @@ while offset < total:
         print(f"Skip existing song... {artist} - {song_name}")
     else:
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get('result')[0].get('link')
+        if os.name != 'posix':
+            song_name = re.sub(r'[<>:"/\|?*]','',song_name)
+        else:
+            pass
         song = YouTube(
             yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
         song.download(output_path=download_path, filename=f"{artist} - {song_name}.mp4")
