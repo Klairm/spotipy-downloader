@@ -2,6 +2,7 @@ import spotipy
 import sys
 import json
 import os
+import re
 from spotipy.oauth2 import SpotifyClientCredentials
 from youtubesearchpython import VideosSearch
 from pytube import YouTube
