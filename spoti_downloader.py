@@ -45,7 +45,6 @@ else:
     download_path = sys.argv[2]
 
 
-
 client_credentials_manager = SpotifyClientCredentials(client_id=cred_json.get(
     'client_id'), client_secret=cred_json.get('client_secret'))
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
@@ -60,7 +59,8 @@ def completed(artist, song_name):
 def progress_bar(chunk, _file_handle, bytes_remaining):
     size = song.filesize
     # X/Y * 100 = Z
-    print(f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artist} - {song_name}", end='\r')
+    print(
+        f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artist} - {song_name}", end='\r')
     if bytes_remaining == 0:
         print(f"Download completed {artist} - {song_name}")
 
@@ -75,20 +75,22 @@ while offset < total:
         'items')[0].get('track').get('name')
     offset += 1
 
-
     if os.path.exists(f"{download_path}/{artist} - {song_name}.mp4"):
         print(f"Skip existing song... {artist} - {song_name}")
     else:
-        yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get('result')[0].get('link')
-        
+        yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get(
+            'result')[0].get('link')
+
         if os.name != 'posix':
-            song_name = re.sub(r'[<>:"/\|?*]','',song_name)
+            song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
         else:
             pass
         try:
-            song = YouTube(yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
-            song.download(output_path=download_path, filename=f"{artist} - {song_name}.mp4")
+            song = YouTube(
+                yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
+            song.download(output_path=download_path,
+                          filename=f"{artist} - {song_name}.mp4")
         except pytube.exceptions.AgeRestrictedError:
             # FIXME: Add some solution to age restricted result
-            print(f"Skipping {artist} - {song_name} due age restriction [FIX NEEDED]")   
-            
+            print(
+                f"Skipping {artist} - {song_name} due age restriction [FIX NEEDED]")
