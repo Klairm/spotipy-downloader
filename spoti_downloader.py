@@ -57,7 +57,7 @@ def completed(artist, song_name):
 
 
 def progress_bar(chunk, _file_handle, bytes_remaining):
-    size = song.filesize
+    size = songDownload.filesize
     # X/Y * 100 = Z
     print(
         f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artist} - {song_name}", end='\r')
@@ -78,6 +78,7 @@ while offset < total:
     if os.path.exists(f"{download_path}/{artist} - {song_name}.mp4"):
         print(f"Skip existing song... {artist} - {song_name}")
     else:
+
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get(
             'result')[0].get('link')
 
@@ -85,12 +86,20 @@ while offset < total:
             song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
         else:
             pass
-        try:
-            song = YouTube(
-                yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
-            song.download(output_path=download_path,
-                          filename=f"{artist} - {song_name}.mp4")
-        except pytube.exceptions.AgeRestrictedError:
-            # FIXME: Add some solution to age restricted result
-            print(
-                f"Skipping {artist} - {song_name} due age restriction [FIX NEEDED]")
+
+        # FIXME: Optimize this
+        song = YouTube(yt_link)
+
+        while(song.age_restricted):
+            print("Restricted age song detected, searching next result...")
+            yt_link = VideosSearch(f"{artist} {song_name}", limit=1)
+            yt_link.next()
+            yt_link = yt_link.result().get(
+                'result')[0].get('link')
+            song = YouTube(yt_link)
+
+        songDownload = YouTube(
+            yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
+
+        songDownload.download(output_path=download_path,
+                              filename=f"{artist} - {song_name}.mp4")
