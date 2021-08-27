@@ -36,8 +36,6 @@ if len(sys.argv) <= 1:
     print("Usage: spoti_downloader.py playlist_url/track_url [path]")
     sys.exit()
 
-# https://open.spotify.com/track/0Zk2R0TwYeOpYUePX7Nm6x?si=db1ff381174442de
-# https://open.spotify.com/playlist/0K7PkGHxDIUyaLJ0nxqQhn?si=bafc41cff77a4030
 
 data_url = sys.argv[1]
 if len(sys.argv) < 3:
