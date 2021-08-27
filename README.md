@@ -7,7 +7,9 @@ Little script in Python to download spotify playlists.
 All the requirements are listed in the requirements.txt, use `python3 -m pip install -r requirements.txt` to install them.
 
 ## Credentials
+
 Credentials are needed in a separate file named `credentials.json` following this structure:
+
 ```
 {
     "client_id":"your_client_id_here",
@@ -30,19 +32,16 @@ If you don't know how to get the client_id and client_secret, you must do the fo
 ```
 
 ## Credits (Modules used):
-	
-		- Spotipy https://github.com/plamere/spotipy
-		- youtube-search-python https://github.com/alexmercerind/youtube-search-python
-		- Pytubee https://github.com/pytube/pytube
-	
-	
+
+    	- Spotipy https://github.com/plamere/spotipy
+    	- youtube-search-python https://github.com/alexmercerind/youtube-search-python
+    	- Pytubee https://github.com/pytube/pytube
 
 ## Usage:
 
 download_path argument is optional, if not set the music will be downloaded in the current folder.
 
 ```
-	python3 spoti_downloader.py playlist_url download_path
+	python3 spoti_downloader.py playlist_url/track_url download_path
 
 ```
-
