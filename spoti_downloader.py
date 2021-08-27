@@ -33,11 +33,13 @@ except FileNotFoundError:
 
 if len(sys.argv) <= 1:
     # Path is optional, by default it will be the current one.
-    print("Usage: spoti_downloader.py playlist_url [path]")
+    print("Usage: spoti_downloader.py playlist_url/track_url [path]")
     sys.exit()
 
+# https://open.spotify.com/track/0Zk2R0TwYeOpYUePX7Nm6x?si=db1ff381174442de
+# https://open.spotify.com/playlist/0K7PkGHxDIUyaLJ0nxqQhn?si=bafc41cff77a4030
 
-playlist_url = sys.argv[1]
+data_url = sys.argv[1]
 if len(sys.argv) < 3:
     print("Using default path...")
     download_path = "."
@@ -49,7 +51,10 @@ client_credentials_manager = SpotifyClientCredentials(client_id=cred_json.get(
     'client_id'), client_secret=cred_json.get('client_secret'))
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-total = sp.playlist_items(playlist_url, fields='total').get('total')
+if data_url.__contains__('playlist'):
+    total = sp.playlist_items(data_url, fields='total').get('total')
+else:
+    total = 1
 
 
 def completed(artist, song_name):
@@ -69,10 +74,15 @@ while offset < total:
     if offset == total:
         break
     # Get artist name and song name using the spotify API
-    artist = sp.playlist_items(playlist_url, offset=offset, fields='items.track.artists.name').get(
-        'items')[0].get('track').get('artists')[0].get('name')
-    song_name = sp.playlist_items(playlist_url, offset=offset, fields='items.track.name').get(
-        'items')[0].get('track').get('name')
+    if data_url.__contains__('playlist'):
+        artist = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get(
+            'items')[0].get('track').get('artists')[0].get('name')
+        song_name = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get(
+            'items')[0].get('track').get('name')
+    elif data_url.__contains__('track'):
+        artist = sp.track(data_url).get('artists')[0].get('name')
+        song_name = sp.track(data_url).get('name')
+
     offset += 1
 
     if os.path.exists(f"{download_path}/{artist} - {song_name}.mp4"):
@@ -81,11 +91,7 @@ while offset < total:
 
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get(
             'result')[0].get('link')
-
-        if os.name != 'posix':
-            song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
-        else:
-            pass
+        song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
 
         # FIXME: Optimize this
         song = YouTube(yt_link)
