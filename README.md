@@ -1,6 +1,6 @@
-# Spotify Playlist Downloader
+# Spotipy Downloader
 
-Little script in Python to download spotify playlists.
+Little script in Python to download spotify playlists and tracks.
 
 # Requirements
 
