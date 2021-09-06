@@ -36,6 +36,11 @@ If you don't know how to get the client_id and client_secret, you must do the fo
     	- Spotipy https://github.com/plamere/spotipy
     	- youtube-search-python https://github.com/alexmercerind/youtube-search-python
     	- Pytubee https://github.com/pytube/pytube
+        - Pydub https://github.com/jiaaro/pydub
+
+### Dependencies
+
+    FFmpeg - https://www.ffmpeg.org/download.html
 
 ## Usage:
 
