@@ -8,6 +8,7 @@ from youtubesearchpython import VideosSearch
 from pytube import YouTube
 import pytube.request
 import pytube.extract
+from util.converter import convert_mp3
 
 
 # Need to change the chunk size to get on_progress callbacks if the song downloading is lower than 9MB -> https://github.com/pytube/pytube/issues/1017
@@ -83,7 +84,7 @@ while offset < total:
 
     offset += 1
 
-    if os.path.exists(f"{download_path}/{artist} - {song_name}.mp4"):
+    if os.path.exists(f"{download_path}/{artist} - {song_name}.mp3"):
         print(f"Skip existing song... {artist} - {song_name}")
     else:
 
@@ -103,7 +104,9 @@ while offset < total:
             song = YouTube(yt_link)
 
         songDownload = YouTube(
-            yt_link, on_progress_callback=progress_bar).streams.get_audio_only()
+            yt_link, on_progress_callback=progress_bar).streams.get_audio_only('mp4')
 
         songDownload.download(output_path=download_path,
                               filename=f"{artist} - {song_name}.mp4")
+        convert_mp3(artist, song_name, download_path)
+        os.remove(f"{download_path}/{artist} - {song_name}.mp4")
