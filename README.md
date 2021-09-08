@@ -1,8 +1,8 @@
-# Spotipy Downloader
+## Spotipy Downloader
 
 Little script in Python to download spotify playlists and tracks.
 
-# Requirements
+## Requirements
 
 All the requirements are listed in the requirements.txt, use `python3 -m pip install -r requirements.txt` to install them.
 
@@ -42,11 +42,16 @@ If you don't know how to get the client_id and client_secret, you must do the fo
 
     FFmpeg - https://www.ffmpeg.org/download.html
 
-## Usage:
-
-download_path argument is optional, if not set the music will be downloaded in the current folder.
+## Syntax:
 
 ```
-	python3 spoti_downloader.py playlist_url/track_url download_path
+	python3 spoti_downloader.py [playlist_url or track_url] (download_path)
 
 ```
+
+## Options
+
+| Option                      | Description                                                           | Example                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `download_path`             | (Optional) Set the download path where to download the track/playlist | `python3 spoti_downloader.py URL /home/user/Music/Rock/`                                                |
+| `playlist_url or track_url` | The track or playlist you want to download                            | `python3 spoti_downloader.py https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=a7d18990986c4f12` |
