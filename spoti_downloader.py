@@ -90,7 +90,10 @@ while offset < total:
 
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get(
             'result')[0].get('link')
+        
         song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
+        artist_name = re.sub(r'[<>:"/\|?*]', '', artist)
+ 
 
         # FIXME: Optimize this
         song = YouTube(yt_link)
@@ -107,6 +110,6 @@ while offset < total:
             yt_link, on_progress_callback=progress_bar).streams.get_audio_only('mp4')
 
         songDownload.download(output_path=download_path,
-                              filename=f"{artist} - {song_name}.mp4")
-        convert_mp3(artist, song_name, download_path)
-        os.remove(f"{download_path}/{artist} - {song_name}.mp4")
+                              filename=f"{artist_name} - {song_name}.mp4")
+        convert_mp3(artist_name, song_name, download_path)
+        os.remove(f"{download_path}/{artist_name} - {song_name}.mp4")
