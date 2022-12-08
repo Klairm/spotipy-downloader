@@ -10,11 +10,18 @@ import pytube.request
 import pytube.extract
 from util.converter import convert_mp3
 
-
 # Need to change the chunk size to get on_progress callbacks if the song downloading is lower than 9MB -> https://github.com/pytube/pytube/issues/1017
 pytube.request.default_range_size = 1048576  # Changed to 1MB
 
 offset = 0
+
+
+class NotEnoughArgs(Exception):
+    pass
+
+
+class InvalidURL(Exception):
+    pass
 
 
 try:
@@ -31,11 +38,13 @@ except FileNotFoundError:
 
         ''')
     sys.exit()
+except NotEnoughArgs:
 
+    sys.exit()
 if len(sys.argv) <= 1:
     # Path is optional, by default it will be the current one.
-    print("Usage: spoti_downloader.py playlist_url/track_url [path]")
-    sys.exit()
+    raise NotEnoughArgs(
+        "Usage: spoti_downloader.py playlist_url/track_url [path]")
 
 
 data_url = sys.argv[1]
@@ -45,18 +54,23 @@ if len(sys.argv) < 3:
 else:
     download_path = sys.argv[2]
 
-
 client_credentials_manager = SpotifyClientCredentials(client_id=cred_json.get(
     'client_id'), client_secret=cred_json.get('client_secret'))
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 if data_url.__contains__('playlist'):
     total = sp.playlist_items(data_url, fields='total').get('total')
-else:
+elif data_url.__contains__('album'):
+    total = sp.album_tracks(data_url).get('total')
+elif data_url.__contains__('track'):
     total = 1
+else:
+    raise InvalidURL(
+        "The URL of the album/playlist/track seems to be invalid.")
 
 
 def completed(artist, song_name):
+
     print(f"Downloaded {artist} - {song_name}")
 
 
@@ -78,6 +92,11 @@ while offset < total:
             'items')[0].get('track').get('artists')[0].get('name')
         song_name = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get(
             'items')[0].get('track').get('name')
+    elif data_url.__contains__('album'):
+        artist = sp.album_tracks(data_url, offset=offset).get('items')[
+            0].get('artists')[0].get('name')
+        song_name = sp.album_tracks(data_url, offset=offset).get('items')[
+            0].get('name')
     elif data_url.__contains__('track'):
         artist = sp.track(data_url).get('artists')[0].get('name')
         song_name = sp.track(data_url).get('name')
@@ -90,15 +109,14 @@ while offset < total:
 
         yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get(
             'result')[0].get('link')
-        
+
         song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
         artist_name = re.sub(r'[<>:"/\|?*]', '', artist)
- 
 
         # FIXME: Optimize this
         song = YouTube(yt_link)
 
-        while(song.age_restricted):
+        while song.age_restricted:
             print("Restricted age song detected, searching next result...")
             yt_link = VideosSearch(f"{artist} {song_name}", limit=1)
             yt_link.next()
