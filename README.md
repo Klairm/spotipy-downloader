@@ -18,7 +18,7 @@ All the requirements are listed in the requirements.txt, use `python3 -m pip ins
 | Option                      | Description                                                           | Example                                                                                                 |
 | --------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `download_path`             | (Optional) Set the download path where to download the track/playlist | `python3 spoti_downloader.py URL /home/user/Music/Rock/`                                                |
-| `playlist_url or track_url` | The track or playlist you want to download                            | `python3 spoti_downloader.py https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=a7d18990986c4f12` |
+| `playlist_url or track_url` | The track,playlist or album you want to download                            | `python3 spoti_downloader.py https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=a7d18990986c4f12` |
 
 ## Credentials
 
