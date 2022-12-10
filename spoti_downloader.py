@@ -69,65 +69,76 @@ else:
         "The URL of the album/playlist/track seems to be invalid.")
 
 
-def completed(artist, song_name):
+def completed(artist, songName):
 
-    print(f"Downloaded {artist} - {song_name}")
+    print(f"Downloaded {artist} - {songName}")
 
 
 def progress_bar(chunk, _file_handle, bytes_remaining):
     size = songDownload.filesize
     # X/Y * 100 = Z
     print(
-        f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artist} - {song_name}", end='\r')
+        f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artistName} - {songName}", end='\r')
     if bytes_remaining == 0:
-        print(f"Download completed {artist} - {song_name}")
+        print(f"Download completed {artistName} - {songName}")
 
 
-while offset < total:
-    if offset == total:
-        break
+def getTrackData(offset):
     # Get artist name and song name using the spotify API
+    artistName = ''
+    songName = ''
+
     if data_url.__contains__('playlist'):
-        artist = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get(
+        artistName = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get(
             'items')[0].get('track').get('artists')[0].get('name')
-        song_name = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get(
+        songName = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get(
             'items')[0].get('track').get('name')
+
     elif data_url.__contains__('album'):
-        artist = sp.album_tracks(data_url, offset=offset).get('items')[
+        artistName = sp.album_tracks(data_url, offset=offset).get('items')[
             0].get('artists')[0].get('name')
-        song_name = sp.album_tracks(data_url, offset=offset).get('items')[
+        songName = sp.album_tracks(data_url, offset=offset).get('items')[
             0].get('name')
+
     elif data_url.__contains__('track'):
-        artist = sp.track(data_url).get('artists')[0].get('name')
-        song_name = sp.track(data_url).get('name')
+        artistName = sp.track(data_url).get('artists')[0].get('name')
+        songName = sp.track(data_url).get('name')
+    return re.sub(r'[<>:"/\|?*]', '', artistName), re.sub(r'[<>:"/\|?*]', '', songName)
 
-    offset += 1
 
-    if os.path.exists(f"{download_path}/{artist} - {song_name}.mp3"):
-        print(f"Skip existing song... {artist} - {song_name}")
+def downloadTrack(artistName, songName):
+    if os.path.exists(f"{download_path}/{artistName} - {songName}.mp3"):
+        print(f"Skip existing song... {artistName} - {songName}")
     else:
 
-        yt_link = VideosSearch(f"{artist} {song_name}", limit=1).result().get(
+        yt_link = VideosSearch(f"{artistName} {songName}", limit=1).result().get(
             'result')[0].get('link')
-
-        song_name = re.sub(r'[<>:"/\|?*]', '', song_name)
-        artist_name = re.sub(r'[<>:"/\|?*]', '', artist)
 
         # FIXME: Optimize this
         song = YouTube(yt_link)
 
         while song.age_restricted:
             print("Restricted age song detected, searching next result...")
-            yt_link = VideosSearch(f"{artist} {song_name}", limit=1)
+            yt_link = VideosSearch(f"{artistName} {songName}", limit=1)
             yt_link.next()
             yt_link = yt_link.result().get(
                 'result')[0].get('link')
             song = YouTube(yt_link)
 
+        global songDownload
         songDownload = YouTube(
             yt_link, on_progress_callback=progress_bar).streams.get_audio_only('mp4')
 
         songDownload.download(output_path=download_path,
-                              filename=f"{artist_name} - {song_name}.mp4")
-        convert_mp3(artist_name, song_name, download_path)
-        os.remove(f"{download_path}/{artist_name} - {song_name}.mp4")
+                              filename=f"{artistName} - {songName}.mp4")
+
+
+while offset < total:
+    if offset == total:
+        break
+    artistName, songName = getTrackData(offset)
+
+    downloadTrack(artistName, songName)
+
+    convert_mp3(artistName, songName, download_path)
+    offset += 1

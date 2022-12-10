@@ -9,6 +9,11 @@ def convert_mp3(artist, song, path):
     mp4_file.export(f'{path}/{artist} - {song}.mp3',
                     format="mp3", bitrate="320k")
     if os.path.isfile(f"{path}/{artist} - {song}.mp3"):
-        print(f"Converted {artist} - {song} to mp3 succesfully")
+        try:
+            os.remove(f"{path}/{artist} - {song}.mp4")
+        except OSError:
+            print("Something went wrong removing the old file" + OSError)
+        else:
+            print(f"Converted {artist} - {song} to ogg successfully")
     else:
         sys.exit("Something went wrong locating the converted .mp3 file.")
