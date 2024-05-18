@@ -89,27 +89,35 @@ def getTrackData(offset):
     # Get artist name and song name using the spotify API
     artistName = ''
     songName = ''
+    albumName = ''
+
     if data_url.__contains__('playlist'):
         artistName = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get(
             'items')[0].get('track').get('artists')[0].get('name')
         songName = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get(
             'items')[0].get('track').get('name')
+        albumName = sp.playlist_items(data_url,offset=offset,fields='items.track.album.name').get('items')[0].get('track').get('album').get('name')
+        
 
     elif data_url.__contains__('album'):
         artistName = sp.album_tracks(data_url, offset=offset).get('items')[
             0].get('artists')[0].get('name')
         songName = sp.album_tracks(data_url, offset=offset).get('items')[
             0].get('name')
+        albumName = sp.album(data_url).get('name')
 
     elif data_url.__contains__('track'):
         artistName = sp.track(data_url).get('artists')[0].get('name')
         songName = sp.track(data_url).get('name')
-    return re.sub(r'[<>:"/\|?*]', '', artistName), re.sub(r'[<>:"/\|?*]', '', songName)
+        albumName = sp.track(data_url).get('album').get('name')
+
+
+    return re.sub(r'[<>:"/\|?*]', '', artistName), re.sub(r'[<>:"/\|?*]', '', songName), re.sub(r'[<>:"/\|?*]', '', albumName),
 
 
 def downloadTrack(artistName, songName):
     
-    if os.path.exists(f"{download_path}/0{offset}_{artistName} - {songName}.mp3"):
+    if os.path.exists(f"{download_path}/{artistName} - {songName}.mp3"):
         print(f"Skip existing song... {artistName} - {songName}")
     else:
 
@@ -138,9 +146,9 @@ def downloadTrack(artistName, songName):
 while offset < total:
     if offset == total:
         break
-    artistName, songName = getTrackData(offset)
+    artistName, songName ,albumName = getTrackData(offset)
 
     downloadTrack(artistName, songName)
 
-    convert_mp3(artistName, songName, download_path,offset+1)
+    convert_mp3(artistName, songName, download_path,offset+1,albumName)
     offset += 1
