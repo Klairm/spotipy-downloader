@@ -48,6 +48,8 @@ if len(sys.argv) <= 1:
 
 
 data_url = sys.argv[1]
+
+data_url = re.sub("/intl[\D][a-z]*","",data_url) # Remove intl-* from the url to make it valid
 if len(sys.argv) < 3:
     print("Using default path...")
     download_path = "."
@@ -87,7 +89,6 @@ def getTrackData(offset):
     # Get artist name and song name using the spotify API
     artistName = ''
     songName = ''
-
     if data_url.__contains__('playlist'):
         artistName = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get(
             'items')[0].get('track').get('artists')[0].get('name')
@@ -107,7 +108,8 @@ def getTrackData(offset):
 
 
 def downloadTrack(artistName, songName):
-    if os.path.exists(f"{download_path}/{artistName} - {songName}.mp3"):
+    
+    if os.path.exists(f"{download_path}/0{offset}_{artistName} - {songName}.mp3"):
         print(f"Skip existing song... {artistName} - {songName}")
     else:
 
@@ -140,5 +142,5 @@ while offset < total:
 
     downloadTrack(artistName, songName)
 
-    convert_mp3(artistName, songName, download_path)
+    convert_mp3(artistName, songName, download_path,offset+1)
     offset += 1
