@@ -112,7 +112,7 @@ def getTrackData(offset):
         albumName = sp.track(data_url).get('album').get('name')
 
 
-    return re.sub(r'[<>:"/\|?*]', '', artistName), re.sub(r'[<>:"/\|?*]', '', songName), re.sub(r'[<>:"/\|?*]', '', albumName),
+    return re.sub(r'[<>:"/\|?*]', '', artistName), re.sub(r'[<>:"/\|?*]', '', songName), re.sub(r'[<>:"/\|?*]', '', albumName)
 
 
 def downloadTrack(artistName, songName):
