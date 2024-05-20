@@ -76,7 +76,7 @@ def completed(artist, songName):
 
 
 def progress_bar(chunk, _file_handle, bytes_remaining):
-    size = songDownload.filesize
+    size = song.filesize
     # X/Y * 100 = Z
     print(
         f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artistName} - {songName}", end='\r')
@@ -123,7 +123,9 @@ def downloadTrack(artistName, songName):
             'result')[0].get('link')
 
         # FIXME: Optimize this
-        song = YouTube(yt_link)
+        global song 
+
+        song = YouTube(yt_link,on_progress_callback=progress_bar)
 
         while song.age_restricted:
             print("Restricted age song detected, searching next result...")
@@ -133,12 +135,12 @@ def downloadTrack(artistName, songName):
                 'result')[0].get('link')
             song = YouTube(yt_link)
 
-        global songDownload
-        songDownload = YouTube(
-            yt_link, on_progress_callback=progress_bar).streams.get_audio_only('mp4')
 
-        songDownload.download(output_path=download_path,
-                              filename=f"{artistName} - {songName}.mp4")
+
+
+        song = song.streams.get_audio_only('mp4')
+        song.download(output_path=download_path,filename=f"{artistName} - {songName}.mp4")
+
 
 
 while offset < total:
