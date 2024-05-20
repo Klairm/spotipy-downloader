@@ -9,6 +9,7 @@ from pytube import YouTube
 import pytube.request
 import pytube.extract
 from util.converter import convert_mp3
+from util.util import cleanString
 
 # Need to change the chunk size to get on_progress callbacks if the song downloading is lower than 9MB -> https://github.com/pytube/pytube/issues/1017
 pytube.request.default_range_size = 1048576  # Changed to 1MB
@@ -39,7 +40,6 @@ except FileNotFoundError:
         ''')
     sys.exit()
 except NotEnoughArgs:
-
     sys.exit()
 if len(sys.argv) <= 1:
     # Path is optional, by default it will be the current one.
@@ -69,7 +69,6 @@ elif data_url.__contains__('track'):
 else:
     raise InvalidURL(
         "The URL of the album/playlist/track seems to be invalid.")
-
 
 def completed(artist, songName):
 
@@ -112,8 +111,7 @@ def getTrackData(offset):
         albumName = sp.track(data_url).get('album').get('name')
 
 
-    return re.sub(r'[<>:"/\|?*]', '', artistName), re.sub(r'[<>:"/\|?*]', '', songName), re.sub(r'[<>:"/\|?*]', '', albumName)
-
+    return  cleanString(songName),cleanString(artistName) ,cleanString(albumName)
 
 def downloadTrack(artistName, songName):
     
