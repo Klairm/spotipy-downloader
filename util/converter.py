@@ -25,5 +25,6 @@ def convert_mp3(artist, song, path, trackNumber,albumName):
         mp3File.tag.title = song
         mp3File.tag.album = albumName
         mp3File.tag.save()
+        print("Added metadata to the song.")
     else:
         sys.exit("Something went wrong locating the converted .mp3 file.")
