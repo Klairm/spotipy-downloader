@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 pytube.request.default_range_size = 1048576  # Changed to 1MB
 
 offset = 0
-max_threads = 4  # Adjust the number of threads based on your system's capability
+max_threads = 10  # Adjust the number of threads based on your system's capability
 
 class NotEnoughArgs(Exception):
     pass
@@ -83,7 +83,7 @@ def getTrackData(offset):
     if 'playlist' in data_url:
         artistName = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get('items')[0].get('track').get('artists')[0].get('name')
         songName = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get('items')[0].get('track').get('name')
-        albumName = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get('items')[0].get('album').get('name')
+        albumName = sp.playlist_items(data_url, offset=offset, fields='items.track.album.name').get('items')[0].get('track').get('album').get('name')
     elif 'album' in data_url:
         artistName = sp.album_tracks(data_url, offset=offset).get('items')[0].get('artists')[0].get('name')
         songName = sp.album_tracks(data_url, offset=offset).get('items')[0].get('name')
