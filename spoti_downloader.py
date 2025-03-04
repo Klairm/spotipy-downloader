@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 pytube.request.default_range_size = 1048576  # Changed to 1MB
 
 offset = 0
-max_threads = 10  # Adjust the number of threads based on your system's capability
+max_threads = os.cpu_count() * 2  # Adjust the number of threads based on your system's capability
 
 class NotEnoughArgs(Exception):
     pass
