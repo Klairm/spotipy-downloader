@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 pytube.request.default_range_size = 1048576  # Changed to 1MB
 
 offset = 0
-max_threads = os.cpu_count() * 2  # Adjust the number of threads based on your system's capability
+max_threads = os.cpu_count()   # Adjust the number of threads based on your system's capability
 
 class NotEnoughArgs(Exception):
     pass
@@ -93,7 +93,7 @@ def getTrackData(offset):
         songName = sp.track(data_url).get('name')
         albumName = sp.track(data_url).get('album').get('name')
 
-    return cleanString(songName), cleanString(artistName), cleanString(albumName)
+    return cleanString(artistName), cleanString(songName), cleanString(albumName)
 
 def search_video(query):
     ydl_opts = {
@@ -137,15 +137,12 @@ def downloadTrack(artistName, songName):
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([yt_link])
                     print(f"Downloaded: {artistName} - {songName}")
+                    
+                    #convert_mp3(artistName,songName,download_path,albumName) I need to make convert work correctly
                     break
             except Exception as e:
                 print(f"Error downloading {artistName} - {songName}: {e}")
-                retry_count -= 1
-                if retry_count > 0:
-                    print(f"Retrying... ({3 - retry_count} attempts left)")
-                    time.sleep(3)
-                else:
-                    print("Max retries reached. Skipping this song.")
+                retry_count = 0 
 
 def main():
     with ThreadPoolExecutor(max_threads) as executor:
