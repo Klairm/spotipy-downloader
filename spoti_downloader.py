@@ -83,7 +83,7 @@ def getTrackData(offset):
     if 'playlist' in data_url:
         artistName = sp.playlist_items(data_url, offset=offset, fields='items.track.artists.name').get('items')[0].get('track').get('artists')[0].get('name')
         songName = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get('items')[0].get('track').get('name')
-        albumName = sp.playlist(data_url, fields='name').get('name')        
+        albumName = sp.playlist_items(data_url, offset=offset, fields='items.track.name').get('items')[0].get('album').get('name')
     elif 'album' in data_url:
         artistName = sp.album_tracks(data_url, offset=offset).get('items')[0].get('artists')[0].get('name')
         songName = sp.album_tracks(data_url, offset=offset).get('items')[0].get('name')
