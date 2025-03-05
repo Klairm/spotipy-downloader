@@ -89,6 +89,8 @@ def getTrackData(offset):
         songName = sp.track(data_url).get('name')
         albumName = sp.track(data_url).get('album').get('name')
 
+
+   
     return cleanString(artistName), cleanString(songName), cleanString(albumName)
 
 def search_video(query):
@@ -126,9 +128,11 @@ def downloadTrack(artistName, songName):
             },
             'force-ipv4': True,
             'no-check-certificate': True,
-            'format': 'bestvideo+bestaudio/best',
-            'outtmpl': f'{download_path}/{artistName} - {songName}',
+            'format': 'bestaudio/best',
+            'outtmpl': f'{download_path}/{artistName} - {songName}.webm',
             'retries': 3,
+
+            
         }
 
         retry_count = 2
@@ -137,11 +141,13 @@ def downloadTrack(artistName, songName):
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([yt_link])
                     print(f"Downloaded: {artistName} - {songName}")
+                    artistName, songName, albumName = getTrackData(offset)
+                    convert_mp3(artistName,songName,download_path,albumName)
                     
-                    #convert_mp3(artistName,songName,download_path,albumName) I need to make convert work correctly
+                   
                     break
             except Exception as e:
-                print(f"Error downloading {artistName} - {songName}: {e} OFFSET: {offset}")
+                print(f"Error downloading {artistName} - {songName}: {e} ")
                 retry_count -= 1
                 time.sleep(1200)
 
@@ -151,7 +157,7 @@ def main():
         for offset in range(total):
             artistName, songName, albumName = getTrackData(offset)
             futures.append(executor.submit(downloadTrack, artistName, songName))
-        
+            
         for future in futures:
             future.result()  # Wait for all tasks to complete
 
