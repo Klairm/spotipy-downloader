@@ -12,6 +12,7 @@ import pytube.extract
 from util.converter import convert_mp3
 from util.util import cleanString
 from pydub import AudioSegment
+import glob
 from concurrent.futures import ThreadPoolExecutor
 
 # Set the range size for pytube
@@ -69,11 +70,6 @@ else:
 def completed(artist, songName):
     print(f"Downloaded {artist} - {songName}")
 
-def progress_bar(chunk, _file_handle, bytes_remaining):
-    size = song.filesize
-    print(f"Downloading {((size - bytes_remaining) / size) * 100:.0f}% - {artistName} - {songName}", end='\r')
-    if bytes_remaining == 0:
-        print(f"Download completed {artistName} - {songName}")
 
 def getTrackData(offset):
     artistName = ''
@@ -107,8 +103,12 @@ def search_video(query):
         return None
 
 def downloadTrack(artistName, songName):
-    if os.path.exists(f"{download_path}/{artistName} - {songName}.mp4"):
-        print(f"Skipping existing video... {artistName} - {songName}")
+
+    pattern = os.path.join(download_path, f"{artistName} - {songName}.*")
+
+
+    if glob.glob(pattern):
+        print(f"Skipping existing track... {artistName} - {songName}")
     else:
         yt_link = search_video(f"{artistName} {songName}")
         
@@ -131,7 +131,7 @@ def downloadTrack(artistName, songName):
             'retries': 3,
         }
 
-        retry_count = 3
+        retry_count = 2
         while retry_count > 0:
             try:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -141,8 +141,9 @@ def downloadTrack(artistName, songName):
                     #convert_mp3(artistName,songName,download_path,albumName) I need to make convert work correctly
                     break
             except Exception as e:
-                print(f"Error downloading {artistName} - {songName}: {e}")
-                retry_count = 0 
+                print(f"Error downloading {artistName} - {songName}: {e} OFFSET: {offset}")
+                retry_count -= 1
+                time.sleep(1200)
 
 def main():
     with ThreadPoolExecutor(max_threads) as executor:
